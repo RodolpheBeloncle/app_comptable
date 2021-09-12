@@ -1,12 +1,11 @@
-from doctest import master
+
 from tkinter import *
-from tkinter import messagebox, ttk
-from random import choice, randint, shuffle
-import pyperclip
+from tkinter import messagebox
 import json
 
 button_label = ""
 on_session = False
+
 
 
 
@@ -51,11 +50,6 @@ def save():
                 else:
                     on_session = True
                     window.destroy()
-
-            finally:
-                id_entry.delete(0, END)
-                password_entry.delete(0, END)
-
 
 def check_data():
     global button_label
@@ -155,20 +149,20 @@ remind_label2.grid(row=4,column=3)
 remind_label2.config(padx=20)
 
 
-separator = ttk.Separator(master, orient=VERTICAL)
-separator.place(relx=0.45, rely=0, relheight=0.9, relwidth=0.005)
-
 # Entries first person
 var = StringVar()
 name_input = Entry(width=21,state=NORMAL,textvariable=var)
 name_input.grid(row=1,column=1)
 name_input.focus()
-month_salary_input = Entry(width=21)
+salary_var = IntVar()
+month_salary_input = Entry(width=21,textvariable=salary_var)
 month_salary_input.grid(row=2,column=1)
 
 
+#Label id_name
 var.trace("w",myInputValue)
 remind_name_label = Label(text="")
+remind_name_label.config(pady=100)
 remind_name_label.grid(column=0,row=5)
 
 # Entries second person
@@ -178,53 +172,100 @@ name_input2.focus()
 month_salary_input2 = Entry(width=21)
 month_salary_input2.grid(row=2,column=4)
 
+date_label = Label(text="Date")
+date_label.place(x=10,y=250)
 
+intitule_label = Label(text="Intitulé")
+intitule_label.place(x=70,y=250)
+
+cost_label = Label(text="Coût")
+cost_label.place(x=225,y=250)
+
+
+def addBox():
+    print("ADD")
+
+    # I use len(all_entries) to get number of next free column
+    next_row = len(all_entries)
+    next_date = len(all_dates)
+    next_check = len(all_checkBox)
+    next_cost = len(all_cost)
+
+
+    # add entry intitule in second row
+    ent_intit = Entry(frame_for_boxes)
+    ent_intit.config(width=15)
+    ent_intit.grid(row=next_row, column=0)
+    all_entries.append(ent_intit)
+
+    # add entry date in second row
+    ent_date = Entry(frame_for_dates)
+    ent_date.config(width=4)
+    ent_date.grid(row=next_date,column=0)
+    all_dates.append(ent_date)
+
+    # add checkbox in second row
+    checkbutton = Checkbutton(frame_for_checkBox)
+    checkbutton.grid(row=next_check,column=0)
+    all_checkBox.append(checkbutton)
+
+
+    intvar = IntVar()
+    vars.append(intvar)
+    ent_cost = Entry(frame_for_cost, text="", width=4, textvariable=vars[-1])
+    ent_cost.grid(row=next_cost, column=0)
+    all_cost.append(ent_cost)
+
+
+#------------------------------------
+
+def showEntries():
+
+    total = 0
+    for number, date in enumerate(all_dates):
+        print(date.get())
+
+    for number, ent in enumerate(all_entries):
+        print(ent.get())
+
+
+    for number, cost in enumerate(all_cost):
+        print(type(cost.get()))
+
+    for value in (vars):
+        print(value.get())
+        total += int(value.get())
+    total_expense_label.config(text=f"Total Dépense: {total} euros ")
+    result = int(salary_var.get()) - total
+    remind_label.config(text=f"Reste après dépenses {result}")
+
+all_entries = []
+all_dates = []
+all_checkBox = []
+all_cost = []
+vars = []
+
+add_input = Button(text="+", command=addBox)
+add_input.place(x=270,y=250)
+
+showButton = Button(text='resumé', command=showEntries)
+showButton.place(x=300,y=250)
+
+
+frame_for_dates = Frame()
+frame_for_dates.place(x=10,y=280)
+
+frame_for_boxes = Frame()
+frame_for_boxes.place(x=70,y=280)
+
+frame_for_checkBox = Frame()
+frame_for_checkBox.place(x=270,y=280)
+
+frame_for_cost = Frame()
+frame_for_cost.place(x=225,y=280)
+
+open_session.mainloop()
 #---------------------------------------------
 
 
 
-
-#Text
-text = Text(height=5, width=30,highlightthickness=0,bg="#f7f5dd")
-#Puts cursor in textbox.
-text.focus()
-#Adds some text to begin with.
-text.insert(END, "Remarques: ")
-#Get's current value in textbox at line 1, character 0
-print(text.get("1.0", END))
-text.grid(row=8,column=1)
-
-
-#Spinbox
-def spinbox_used():
-    #gets the current value in spinbox.
-    print(spinbox.get())
-spinbox = Spinbox(from_=0, to=10, width=5, command=spinbox_used)
-spinbox.grid(row=7,column=4)
-
-
-#Checkbutton
-def checkbutton_used():
-    #Prints 1 if On button checked, otherwise 0.
-    print(checked_state.get())
-#variable to hold on to checked state, 0 is off, 1 is on.
-checked_state = IntVar()
-checkbutton = Checkbutton(text="Is On?", variable=checked_state, command=checkbutton_used)
-checked_state.get()
-checkbutton.grid(row=9,column=4)
-
-
-#Listbox
-def listbox_used(event):
-    # Gets current selection from listbox
-    print(listbox.get(listbox.curselection()))
-
-listbox = Listbox(height=4)
-fruits = ["Apple", "Pear", "Orange", "Banana"]
-for item in fruits:
-    listbox.insert(fruits.index(item), item)
-listbox.bind("<<ListboxSelect>>", listbox_used)
-listbox.grid(row=12,column=4)
-
-
-open_session.mainloop()
